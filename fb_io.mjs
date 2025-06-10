@@ -2,9 +2,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase
 import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { ref, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-const COL_C = 'white';	    // These two const are part of the coloured 	
-const COL_B = '#CD7F32'; 
+const COL_C = 'white';	    	
+const COL_B = '#CD7F32';	
+console.log('%c fb_io.mjs',
+    'color: blue; background-color: white;');
 var fb_gameDB;
 var fb_uid;
 
@@ -14,7 +15,7 @@ function fb_initialise() {
     const FB_GAMECONFIG = {
         apiKey: "AIzaSyCHDtQ5nuCxgp_XCL_RtR7YVHv8mO1rhmc",
         authDomain: "comp-2025-max-bergman-4bb13.firebaseapp.com",
-        databaseURL: "https://comp-2025-max-bergman-4bb13-defaut-rtdb.asia-southeast1.firebasedatabase.app",
+        databaseURL: "https://comp-2025-max-bergman-4bb13-default-rtdb.asia-southeast1.firebasedatabase.app",
         projectId: "comp-2025-max-bergman-4bb13",
         storageBucket: "comp-2025-max-bergman-4bb13.firebasestorage.app",
         messagingSenderId: "75891205088",
@@ -29,7 +30,6 @@ function fb_initialise() {
 }
 
 function fb_authenticate() {
-    console.log("In autghenticate")
     const AUTH = getAuth();
     const PROVIDER = new GoogleAuthProvider();
 
@@ -40,7 +40,7 @@ function fb_authenticate() {
         prompt: 'select_account'
     });
     signInWithPopup(AUTH, PROVIDER).then((result) => {
-         console.log(result);
+        console.log(result);
         console.log(result.user.uid);
         fb_uid = result.user.uid;
     })
@@ -49,27 +49,25 @@ function fb_authenticate() {
         });
 }
 
- function fb_writeto(){
-    const dbReference = ref(fb_gameDB, ("Users/" + fb_uid));
-    var _Address = document.getElementById("Address").value;
-    var _Age = document.getElementById("Age").value;
-    var _Name = document.getElementById("Name").value;
-    var UserInformation = {Address: _Address, favoriteFruit: _favoriteFruit, _fruitQuantity: _fruitQuantity };
-    set(dbReference, UserInformation).then(() => {
+function fb_write(){
+const dbReference = ref(fb_gameDB, ("Users/" + fb_uid));
+var UserInformation = { highscore: 50, Name: "person" };
+set(dbReference, UserInformation).then(() => {
 
-        console.log("written the following indformation to the database");
-        console.log(UserInformation);
-    }).catch((error) => {
+    console.log("data written successfully")
+    console.log(UserInformation);
 
-        console.log("write error");
-        console.log(error);
-    });
+}).catch((error) => {
+
+    console.log("write error");
+    console.log(error);
+
+});
 }
 
 
-
 export {
-  fb_initialise,
-  fb_authenticate,
-  fb_writeto
+    fb_initialise,
+    fb_authenticate,
+    fb_write
 };
