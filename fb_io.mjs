@@ -1,15 +1,17 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { ref, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-const COL_C = 'white';	    	
-const COL_B = '#CD7F32';	
-console.log('%c fb_io.mjs',
-    'color: blue; background-color: white;');
+import { ref, set, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+const COL_C = 'white';
+const COL_B = '#CD7F32';
+
+console.log('%c fb_io.mjs', 'color: blue; background-color: white;');
+
 var fb_gameDB;
 var fb_uid;
 
-function fb_initialise() {
+function fb_authenticate() {
     console.log('%c fb_initialise(): ', 'color: ' + COL_C + '; background-color: ' + COL_B + ';');
     console.log("hello world");
     const FB_GAMECONFIG = {
@@ -27,47 +29,56 @@ function fb_initialise() {
     fb_gameDB = getDatabase(FB_GAMEAPP);
 
     console.info(fb_gameDB);
-}
-
-function fb_authenticate() {
     const AUTH = getAuth();
     const PROVIDER = new GoogleAuthProvider();
 
     // The following makes Google ask the user to select the account
-
     PROVIDER.setCustomParameters({
-
         prompt: 'select_account'
     });
+
     signInWithPopup(AUTH, PROVIDER).then((result) => {
         console.log(result);
         console.log(result.user.uid);
         fb_uid = result.user.uid;
-    })
-        .catch((error) => {
-            console.log(error);
-        });
+    }).catch((error) => {
+        console.log(error);
+    });
 }
 
-function fb_write(){
-const dbReference = ref(fb_gameDB, ("Users/" + fb_uid));
-var UserInformation = { highscore: 50, Name: "person" };
-set(dbReference, UserInformation).then(() => {
-
-    console.log("data written successfully")
-    console.log(UserInformation);
-
-}).catch((error) => {
-
-    console.log("write error");
-    console.log(error);
-
-});
+function fb_write() {
+    const dbReference = ref(fb_gameDB, ("Users/" + fb_uid));
+    var _name = document.getElementById("name").value;
+    var _email = document.getElementById("email").value;
+    var UserInformation = { name: _name, email: _email };
+    set(dbReference, UserInformation).then(() => {
+        console.log("written the following indformation to the database");
+        console.log(UserInformation);
+    }).catch((error) => {
+        console.log("write error");
+        console.log(error);
+    });
 }
 
+function fb_read() {
+    const dbReference = ref(fb_gameDB, ("Users/" + fb_uid));
+    get(dbReference).then((snapshot) => {
+        var fb_data = snapshot.val();
+        if (fb_data != null) {
+            console.log("successful read");
+            console.log(fb_data);
+        } else {
+            console.log("no record found");
+            console.log(fb_data);
+        }
+    }).catch((error) => {
+        console.log("read error");
+        console.log(error);
+    });
+}
 
 export {
-    fb_initialise,
     fb_authenticate,
-    fb_write
+    fb_write,
+    fb_read
 };

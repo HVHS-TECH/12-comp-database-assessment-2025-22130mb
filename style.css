@@ -1,0 +1,60 @@
+
+body {
+  background-color: rgb(96, 196, 230);
+  color: rgb(88, 197, 233);
+  font-family: Arial, sans-serif;
+  padding: 2rem;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  color: rgb(90, 195, 230);
+  font-size: 2.5rem;
+  margin-bottom: 0;
+}
+
+h2 {
+  color: rgb(90, 195, 230);
+  font-size: 1.2rem;
+  margin-top: 0.2rem;
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.3rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+button {
+  margin-top: 1.5rem;
+  padding: 0.7rem 1.2rem;
+  background-color: rgb(90, 195, 230);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: rgb(90, 195, 230);
+}
+
+#statusMessage {
+  margin-top: 1rem;
+  font-style: italic;
+}
