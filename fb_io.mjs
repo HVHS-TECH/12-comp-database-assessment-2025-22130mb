@@ -39,8 +39,8 @@ function fb_authenticate() {
 
     signInWithPopup(AUTH, PROVIDER).then((result) => {
         console.log(result);
-        console.log(result.user.uid);
-        fb_uid = result.user.uid;
+        console.log(result.user.email);
+        fb_uid = result.user.email;
     }).catch((error) => {
         console.log(error);
     });
@@ -61,7 +61,8 @@ function fb_write() {
 }
 
 function fb_read() {
-    const dbReference = ref(fb_gameDB, ("Users/" + fb_uid));
+    const dbReference
+     = ref(fb_gameDB, ("Users/" + fb_uid));
     get(dbReference).then((snapshot) => {
         var fb_data = snapshot.val();
         if (fb_data != null) {
