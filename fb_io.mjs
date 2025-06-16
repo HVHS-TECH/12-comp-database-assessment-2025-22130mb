@@ -10,6 +10,8 @@ console.log('%c fb_io.mjs', 'color: blue; background-color: white;');
 
 var fb_gameDB;
 var fb_uid;
+var fb_email;
+
 
 function fb_authenticate() {
     console.log('%c fb_initialise(): ', 'color: ' + COL_C + '; background-color: ' + COL_B + ';');
@@ -40,17 +42,19 @@ function fb_authenticate() {
     signInWithPopup(AUTH, PROVIDER).then((result) => {
         console.log(result);
         console.log(result.user.email);
-        fb_uid = result.user.email;
+        fb_email = result.user.email;
+         console.log(result.user.uid);
+        fb_uid = result.user.uid;
     }).catch((error) => {
         console.log(error);
     });
 }
 
 function fb_write() {
-    const dbReference = ref(fb_gameDB, ("Users/" + fb_uid));
+    const safe_uid = fb_uid.replace(/\./g, '_');
+    const dbReference = ref(fb_gameDB, ("Users/" + safe_uid));
     var _name = document.getElementById("name").value;
-    var _email = document.getElementById("email").value;
-    var UserInformation = { name: _name, email: _email };
+    var UserInformation = { name: _name, email: fb_email };
     set(dbReference, UserInformation).then(() => {
         console.log("written the following indformation to the database");
         console.log(UserInformation);
