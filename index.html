@@ -6,27 +6,36 @@
   <title>Max's Marvelous Games</title>
   <link rel="stylesheet" href="style.css" />
   <script type="module" src="./main.mjs"></script>
+  <script type="module" src="./fb_io.js"></script> <!-- Firebase functions import -->
 </head>
 <body>
   <div class="container">
     <h1>Max's Marvelous Games</h1>
    
+    <!-- Login Button -->
     <button onclick="fb_authenticate()">Login with Google</button>
     
+    <!-- Name Form -->
     <form id="fruitForm">
       <label for="name">Your Name:</label>
       <input type="text" id="name" name="name" required />
-
-
-      <label for="Leaderboards">Leaderboard:</label>
     </form>
 
+    <!-- Submit Button to Write Data to Firebase -->
     <button onclick="fb_write()">Submit</button>
-    <button onclick="()">Play Coin Collector!</button>
-      <button type="button">Play Whack A Mole!</button>
-  
+
+    <!-- Game Buttons -->
+    <button onclick="goToWhackAMole()">Play Whack A Mole!</button> <!-- This button will redirect to game.html -->
 
     <p id="statusMessage"></p>
   </div>
+
+  <!-- JavaScript for Navigation -->
+  <script>
+    function goToWhackAMole() {
+      // Redirects to game.html when the button is clicked
+      window.location.href = "game.html";
+    }
+  </script>
 </body>
 </html>
