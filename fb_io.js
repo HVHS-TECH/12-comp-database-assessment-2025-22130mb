@@ -5,7 +5,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstati
 const COL_C = 'white';
 const COL_B = '#CD7F32';
 
-console.log('%c fb_io.mjs', 'color: blue; background-color: white;');
+console.log('%c fb_io.js', 'color: blue; background-color: white;');
 
 // Firebase App Initialization
 const FB_GAMECONFIG = {

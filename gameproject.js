@@ -142,11 +142,9 @@ function showEndScreen() {
     wallRH.visible = false;
     wallTop.visible = false;
     wallBot.visible = false;
-//this is the end screen and it hides everything on the screen that would be showing up on the game state "playing"
     if (currentBall) {
         currentBall.remove();
     }
-
     for (let i = 0; i < Score; i++) {
         image(
             imgFace,
@@ -156,6 +154,7 @@ function showEndScreen() {
         );
     }
 
+    // --- ADD THIS BLOCK ---
     if (!showEndScreen.scoreWritten) {
         writeScoreToFirebase(Score);
         showEndScreen.scoreWritten = true;
@@ -170,17 +169,8 @@ function restartGame() {
     if (currentBall) {
         currentBall.remove();
     }
-    showEndScreen.scoreWritten = false;
+    showEndScreen.scoreWritten = false; // Reset flag
 }
-
-function writeScoreToFirebase(score) {
-    const scoresRef = database.ref('scores');
-    const newScoreRef = scoresRef.push();
-    newScoreRef.set({
-        score: score,
-    });
-}
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyCHDtQ5nuCxgp_XCL_RtR7YVHv8mO1rhmc",
@@ -192,6 +182,19 @@ const firebaseConfig = {
     appId: "1:75891205088:web:9ce6dd10fe8f59fb6f8185",
     measurementId: "G-860HVWZ49V"
 };
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+
+function writeScoreToFirebase(score) {
+  const usersRef = database.ref('users');
+  usersRef.push({
+    score: score,
+    timestamp: Date.now()
+  });
+}
+
+// Example: call this when the round ends
+function endRound() {
+  // ...your round end logic...
+  writeScoreToFirebase(currentScore); // replace with your score variable
+}
