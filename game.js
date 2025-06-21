@@ -155,6 +155,11 @@ function showEndScreen() {
             50, 50
         );
     }
+
+    if (!showEndScreen.scoreWritten) {
+        writeScoreToFirebase(Score);
+        showEndScreen.scoreWritten = true;
+    }
 }
 
 function restartGame() {
@@ -165,4 +170,28 @@ function restartGame() {
     if (currentBall) {
         currentBall.remove();
     }
+    showEndScreen.scoreWritten = false;
 }
+
+function writeScoreToFirebase(score) {
+    const scoresRef = database.ref('scores');
+    const newScoreRef = scoresRef.push();
+    newScoreRef.set({
+        score: score,
+    });
+}
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCHDtQ5nuCxgp_XCL_RtR7YVHv8mO1rhmc",
+    authDomain: "comp-2025-max-bergman-4bb13.firebaseapp.com",
+    databaseURL: "https://comp-2025-max-bergman-4bb13-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "comp-2025-max-bergman-4bb13",
+    storageBucket: "comp-2025-max-bergman-4bb13.firebasestorage.app",
+    messagingSenderId: "75891205088",
+    appId: "1:75891205088:web:9ce6dd10fe8f59fb6f8185",
+    measurementId: "G-860HVWZ49V"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();

@@ -6,7 +6,7 @@
   <title>Max's Marvelous Games</title>
   <link rel="stylesheet" href="style.css" />
   <script type="module" src="./main.mjs"></script>
-  <script type="module" src="./fb_io.js"></script> <!-- Firebase functions import -->
+  <script type="module" src="./fb_io.js"></script> <!-- Firebase functions -->
 </head>
 <body>
   <div class="container">
@@ -24,16 +24,15 @@
     <!-- Submit Button to Write Data to Firebase -->
     <button onclick="fb_write()">Submit</button>
 
-    <!-- Game Buttons -->
-    <button onclick="goToWhackAMole()">Play Whack A Mole!</button> <!-- This button will redirect to game.html -->
+    <!-- Game Button -->
+    <button onclick="goToWhackAMole()">Play Whack A Mole!</button>
 
     <p id="statusMessage"></p>
   </div>
 
-  <!-- JavaScript for Navigation -->
+  <!-- Page Navigation Script -->
   <script>
     function goToWhackAMole() {
-      // Redirects to game.html when the button is clicked
       window.location.href = "game.html";
     }
   </script>
