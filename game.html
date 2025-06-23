@@ -1,28 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>gameproject</title>
+  <title>Whack-A-Mole Game</title>
   <meta charset="UTF-8">
-  <meta name="description" content="12COMP P5.play">
-  <meta name="keywords" content="12COMP, P5.play">
-  <meta name="author" content="Max Bergman">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- P5.js & P5.play *****************************-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/p5.js" integrity="sha512-bzpp8klYroR6PFgL3RJ+VkvY5hJna7Zd38OA56peUDHSNQpSiN9lDQVnMYtcw7hoAVhbR6mAOdH+ymzg1o+G0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/addons/p5.sound.js" integrity="sha512-TU9AWtV5uUZPX8dbBAH8NQF1tSdigPRRT82vllAQ1Ke28puiqLA6ZVKxtUGlgrH6yWFnkKy+sE6luNEGH9ar0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  
+  <!-- Load p5.js first -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/addons/p5.sound.js"></script>
   <script src="https://p5play.org/v3/planck.min.js"></script>
   <script src="https://p5play.org/v3/p5play.js"></script>
-  
+
+  <!-- Load Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+  <!-- Initialize Firebase -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCHDtQ5nuCxgp_XCL_RtR7YVHv8mO1rhmc",
+      authDomain: "comp-2025-max-bergman-4bb13.firebaseapp.com",
+      databaseURL: "https://comp-2025-max-bergman-4bb13-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "comp-2025-max-bergman-4bb13",
+      storageBucket: "comp-2025-max-bergman-4bb13.appspot.com",
+      messagingSenderId: "75891205088",
+      appId: "1:75891205088:web:9ce6dd10fe8f59fb6f8185"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
 </head>
 
-<!--***************************************************
-  BODY
-****************************************************-->
 <body>
+  <!-- Simple loading message -->
+  <div id="loading">Loading game...</div>
+  
+  <!-- Load game script AFTER all dependencies -->
   <script src="gameproject.js"></script>
 </body>
 </html>
-<!--***************************************************
-  END OF INDEX.HTML
-****************************************************-->

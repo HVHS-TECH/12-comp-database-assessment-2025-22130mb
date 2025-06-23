@@ -1,100 +1,153 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-
+import { 
+  getDatabase, 
+  ref, 
+  set, 
+  query, 
+  orderByChild, 
+  limitToLast, 
+  onValue,
+  serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithPopup,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 const COL_C = 'white';
 const COL_B = '#CD7F32';
 
-
 console.log('%c fb_io.js', 'color: blue; background-color: white;');
 
-
-// Firebase App Initialization
+// Firebase Configuration
 const FB_GAMECONFIG = {
-    apiKey: "AIzaSyCHDtQ5nuCxgp_XCL_RtR7YVHv8mO1rhmc",
-    authDomain: "comp-2025-max-bergman-4bb13.firebaseapp.com",
-    databaseURL: "https://comp-2025-max-bergman-4bb13-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "comp-2025-max-bergman-4bb13",
-    storageBucket: "comp-2025-max-bergman-4bb13.firebasestorage.app",
-    messagingSenderId: "75891205088",
-    appId: "1:75891205088:web:9ce6dd10fe8f59fb6f8185",
-    measurementId: "G-860HVWZ49V"
+  apiKey: "AIzaSyCHDtQ5nuCxgp_XCL_RtR7YVHv8mO1rhmc",
+  authDomain: "comp-2025-max-bergman-4bb13.firebaseapp.com",
+  databaseURL: "https://comp-2025-max-bergman-4bb13-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "comp-2025-max-bergman-4bb13",
+  storageBucket: "comp-2025-max-bergman-4bb13.firebasestorage.app",
+  messagingSenderId: "75891205088",
+  appId: "1:75891205088:web:9ce6dd10fe8f59fb6f8185",
+  measurementId: "G-860HVWZ49V"
 };
 
-
+// Initialize Firebase
 const FB_GAMEAPP = initializeApp(FB_GAMECONFIG);
 const fb_gameDB = getDatabase(FB_GAMEAPP);
+const auth = getAuth(FB_GAMEAPP);
 
+// Authentication state tracker
+let currentUser = null;
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  console.log(user ? "User logged in:" : "User logged out", user?.uid);
+});
 
-var fb_uid;
-var fb_email;
+// Improved authentication with async/await
+async function fb_authenticate() {
+  console.log('%c fb_authenticate(): ', `color: ${COL_C}; background-color: ${COL_B};`);
+  
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
 
-
-function fb_authenticate() {
-    console.log('%c fb_initialise(): ', 'color: ' + COL_C + '; background-color: ' + COL_B + ';');
-    const AUTH = getAuth();
-    const PROVIDER = new GoogleAuthProvider();
-
-
-    PROVIDER.setCustomParameters({
-        prompt: 'select_account'
-    });
-
-
-    signInWithPopup(AUTH, PROVIDER).then((result) => {
-        console.log(result);
-        console.log(result.user.email);
-        fb_email = result.user.email;
-        console.log(result.user.uid);
-        fb_uid = result.user.uid;
-    }).catch((error) => {
-        console.log(error);
-    });
+  try {
+    const result = await signInWithPopup(auth, provider);
+    console.log("Authenticated user:", result.user.uid);
+    return result.user;
+  } catch (error) {
+    console.error("Authentication failed:", error);
+    throw error;
+  }
 }
 
+// User profile writer
+async function fb_write() {
+  if (!currentUser) {
+    console.error("User not authenticated");
+    return false;
+  }
 
-function fb_write(score) {
-    if (!fb_uid || !fb_email) {
-        console.log("User is not authenticated");
-        return;  // Prevent writing if the user is not authenticated
-    }
-    if (typeof score === 'undefined') {
-        console.log("Score is undefined, not writing to Firebase.");
-        return;
-    }
+  const name = document.getElementById("name")?.value?.trim();
+  if (!name) {
+    console.error("Name is required");
+    return false;
+  }
 
-    const safe_uid = fb_uid.replace(/\./g, '_');
-    const dbReference = ref(fb_gameDB, `Users/${safe_uid}/scores`);
-    var _name = document.getElementById("name").value;
+  const safeUid = currentUser.uid.replace(/\./g, '_');
+  const userRef = ref(fb_gameDB, `Users/${safeUid}`);
 
-    if (!_name) {
-        console.log("Please provide a name");
-        return;  // Prevent writing if the name is not provided
-    }
-
-    var UserInformation = { name: _name, email: fb_email, score: score };
-
-    // Use push to allow multiple scores per user
-    import('https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js').then(({ push }) => {
-        push(dbReference, UserInformation)
-            .then(() => {
-                console.log("Written the following information to the database:");
-                console.log(UserInformation);
-            })
-            .catch((error) => {
-                console.log("Write error:");
-                console.log(error);
-            });
+  try {
+    await set(userRef, {
+      name: name,
+      email: currentUser.email,
+      lastUpdated: serverTimestamp()
     });
+    console.log("User profile updated");
+    return true;
+  } catch (error) {
+    console.error("Profile update failed:", error);
+    return false;
+  }
 }
 
+// Score writer with validation
+async function fb_writeScore(score) {
+  if (!currentUser) {
+    console.error("Cannot save score: No authenticated user");
+    return false;
+  }
+
+  if (typeof score !== 'number' || score < 0) {
+    console.error("Invalid score value:", score);
+    return false;
+  }
+
+  const safeUid = currentUser.uid.replace(/\./g, '_');
+  const scoresRef = ref(fb_gameDB, `Scores/${safeUid}`);
+
+  try {
+    await set(scoresRef, {
+      name: document.getElementById("name")?.value?.trim() || "Anonymous",
+      score: score,
+      timestamp: serverTimestamp()
+    });
+    console.log("Score saved successfully");
+    return true;
+  } catch (error) {
+    console.error("Score save failed:", error);
+    return false;
+  }
+}
+
+// Leaderboard reader with realtime updates
+function fb_getLeaderboard(callback) {
+  const scoresRef = ref(fb_gameDB, 'Scores');
+  const leaderboardQuery = query(
+    scoresRef,
+    orderByChild('score'),
+    limitToLast(10)
+  );
+
+  const unsubscribe = onValue(leaderboardQuery, (snapshot) => {
+    const scores = [];
+    snapshot.forEach((child) => {
+      scores.push({
+        id: child.key,
+        ...child.val()
+      });
+    });
+    callback(scores.sort((a, b) => b.score - a.score));
+  });
+
+  // Return unsubscribe function for cleanup
+  return unsubscribe;
+}
 
 export {
-    fb_authenticate,
-    fb_write
+  fb_authenticate,
+  fb_write,
+  fb_writeScore,
+  fb_getLeaderboard
 };
-
-
-
-

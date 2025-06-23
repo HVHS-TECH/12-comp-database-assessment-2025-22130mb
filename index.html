@@ -2,64 +2,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>gameproject</title>
-  <meta charset="UTF-8">
-  <meta name="description" content="12COMP P5.play">
-  <meta name="keywords" content="12COMP, P5.play">
-  <meta name="author" content="Max Bergman">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Max's Marvelous Games</title>
   <link rel="stylesheet" href="style.css" />
-
-  <!-- P5.js & P5.play -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/p5.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/addons/p5.sound.js"></script>
-  <script src="https://p5play.org/v3/planck.min.js"></script>
-  <script src="https://p5play.org/v3/p5play.js"></script>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script type="module" src="./main.mjs"></script>
+  <script type="module" src="./fb_io.js"></script>
 </head>
 <body>
   <div class="container">
     <h1>Max's Marvelous Games</h1>
+   
+    <!-- Login Button -->
     <button onclick="fb_authenticate()">Login with Google</button>
-    <form id="form">
+   
+    <!-- Name Form -->
+    <form id="fruitForm">
       <label for="name">Your Name:</label>
       <input type="text" id="name" name="name" required />
     </form>
+
+    <!-- Submit Button -->
     <button onclick="fb_write()">Submit</button>
+
+    <!-- Game Button -->
     <button onclick="goToWhackAMole()">Play Whack A Mole!</button>
+
+    <!-- NEW: Leaderboard Button -->
+    <button onclick="window.location.href='leaderboard.html'">View Leaderboard</button>
+
     <p id="statusMessage"></p>
-    <div>
-      <h2>Leaderboard</h2>
-      <ol id="leaderboard"></ol>
-    </div>
   </div>
 
-  <script type="module" src="main.mjs"></script>
+  <!-- Page Navigation Script -->
   <script>
     function goToWhackAMole() {
       window.location.href = "game.html";
     }
-    // Optionally, call fetchLeaderboard() if you have it in fb_io.js
-    window.onload = function () {
-      if (typeof fetchLeaderboard === "function") fetchLeaderboard();
-    };
-  </script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCHDtQ5nuCxgp_XCL_RtR7YVHv8mO1rhmc",
-      authDomain: "comp-2025-max-bergman-4bb13.firebaseapp.com",
-      databaseURL: "https://comp-2025-max-bergman-4bb13-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "comp-2025-max-bergman-4bb13",
-      storageBucket: "comp-2025-max-bergman-4bb13.appspot.com",
-      messagingSenderId: "75891205088",
-      appId: "1:75891205088:web:9ce6dd10fe8f59fb6f8185",
-      measurementId: "G-860HVWZ49V"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
   </script>
 </body>
 </html>

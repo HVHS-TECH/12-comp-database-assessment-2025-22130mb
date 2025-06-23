@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Leaderboard - Max's Marvelous Games</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #CD7F32;
+      text-align: center;
+    }
+    #scores-container {
+      margin: 20px 0;
+      min-height: 300px;
+    }
+    .score-entry {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      margin: 5px 0;
+      background: #f9f9f9;
+      border-radius: 4px;
+    }
+    .loading, .error {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+    .buttons {
+      text-align: center;
+      margin-top: 20px;
+    }
+    button {
+      background-color: #CD7F32;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Top Scores</h1>
+    <div id="scores-container">
+      <p class="loading">Loading scores...</p>
+    </div>
+    <div class="buttons">
+      <button onclick="window.location.href='index.html'">Back to Home</button>
+      <button onclick="window.location.href='game.html'">Play Again</button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+  <script>
+    // Initialize Firebase with your config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCHDtQ5nuCxgp_XCL_RtR7YVHv8mO1rhmc",
+      authDomain: "comp-2025-max-bergman-4bb13.firebaseapp.com",
+      databaseURL: "https://comp-2025-max-bergman-4bb13-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "comp-2025-max-bergman-4bb13",
+      storageBucket: "comp-2025-max-bergman-4bb13.appspot.com",
+      messagingSenderId: "75891205088",
+      appId: "1:75891205088:web:9ce6dd10fe8f59fb6f8185"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    function displayScores(scores) {
+      const container = document.getElementById('scores-container');
+      
+      if (!scores || scores.length === 0) {
+        container.innerHTML = '<p class="loading">No scores yet. Be the first to play!</p>';
+        return;
+      }
+      
+      // Sort scores from highest to lowest
+      scores.sort((a, b) => b.score - a.score);
+      
+      container.innerHTML = scores.map((score, index) => `
+        <div class="score-entry">
+          <span>${index + 1}. ${score.name || 'Anonymous'}</span>
+          <span>${score.score} points</span>
+        </div>
+      `).join('');
+    }
+
+    function loadLeaderboard() {
+      const scoresRef = database.ref('Scores');
+      
+      scoresRef.orderByChild('score').limitToLast(10).on('value', (snapshot) => {
+        const scores = [];
+        snapshot.forEach((childSnapshot) => {
+          scores.push(childSnapshot.val());
+        });
+        displayScores(scores);
+      }, (error) => {
+        document.getElementById('scores-container').innerHTML = 
+          '<p class="error">Error loading scores. Please check console.</p>';
+        console.error("Firebase error:", error);
+      });
+    }
+
+    // Start loading when page loads
+    window.addEventListener('DOMContentLoaded', loadLeaderboard);
+  </script>
+</body>
+</html>

@@ -1,15 +1,9 @@
-// IMPORTANT: Make sure you have initialized Firebase and defined 'database' before this script is loaded.
-// Example (in your HTML before this script):
-// <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-// <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-// <script>
-//   const firebaseConfig = { ... };
-//   firebase.initializeApp(firebaseConfig);
-//   var database = firebase.database();
-// </script>
-
 // Game Project
 // Written by Max Bergman
+
+// Initialize Firebase (using compat version loaded in HTML)
+const database = firebase.database();
+const auth = firebase.auth();
 
 var timerValue = 10;
 var Ballnumber = 1;
@@ -25,7 +19,7 @@ function preload() {
     imgFace = loadImage('images/pixil-frame-0.png');
     imgHammer = loadImage('images/hammer.png');
     Background = loadImage('images/background.png');
-} //loads all images in
+}
 
 function setup() {
     createCanvas(1000, 1000);
@@ -40,7 +34,7 @@ function setup() {
     wallRH = new Sprite(1000, 500, 15, 1000, 'k');
     wallTop = new Sprite(500, 0, 1000, 15, 'k');
     wallBot = new Sprite(500, 1000, 1000, 15, 'k');
-    //spawns walls
+    
     wallLH.color = wallRH.color = wallTop.color = wallBot.color = 'white';
     wallLH.visible = wallRH.visible = wallTop.visible = wallBot.visible = false;
 }
@@ -65,15 +59,14 @@ function draw() {
     } else if (gameState === "end") {
         showEndScreen();
     }
-} //this block of code just gets the game started once the game state is changed to playing. it makes all walls appear and makes the score and timer show up
+}
 
 function mousePressed() {
     if (gameState === "start") {
         gameState = "playing";
         createBall();
-    } //create ball if game state = playing
+    }
 }
-
  
 function keyPressed() {
     checkKey(key);
@@ -81,16 +74,14 @@ function keyPressed() {
 
 function checkKey(_keyPressed) {
     if (_keyPressed === " " || _keyPressed === "Enter") {
-        console.log("Game Started!");
         if (gameState === "start") {
             gameState = "playing";
             createBall();
         }
     } else if (_keyPressed === 'r' || _keyPressed === 'R') {
-        console.log("Game Restarted!");
         restartGame();
     }
-} // if r key is pressed it will check the gamestate and change it from the start screen to playing state
+}
 
 function displayTimer() {
     textSize(100);
@@ -100,34 +91,34 @@ function displayTimer() {
 
     if (frameCount % 60 == 0 && timer > 0) {
         timer--;
-    } //timer is at 60 frames per second so it changes by 1 second every 60 seconds
+    }
 
     if (timer <= 0) {
         gameState = "end";
     }
-} //if timer=0 then gamestate = end
+}
 
 function score() {
     textSize(35);
     fill('Black');
     text("Score: " + Score, 80, 50);
-} //makes text with score show up
+}
 
 function createBall() {
     if (currentBall) {
         currentBall.remove();
-    } //this makes it so that once a mole get hit it dissapears
+    }
 
     currentBall = new Sprite(random(100, 900), random(100, 900), 50, 50, 'k');
     currentBall.img = imgFace;
     currentBall.scale = 0.5;
-// this spawns a new mole in a random spot
+
     currentBall.collides(bat, function (ball, bat) {
         ball.remove();
         Score++;
         createBall();
     });
-} //Adds 1 score each time a ball is removed
+}
 
 function showStartScreen() {
     background(0);
@@ -135,7 +126,29 @@ function showStartScreen() {
     fill('white');
     textAlign(CENTER, CENTER);
     text("Click or Press Enter To Start", width / 2, height / 2);
-} // 
+}
+
+// NEW: Firebase Score Saving Function
+function saveScoreToFirebase(score) {
+    const user = auth.currentUser;
+    if (!user) {
+        console.log("User not authenticated - score not saved");
+        return;
+    }
+
+    const safeUid = user.uid.replace(/\./g, '_');
+    const playerName = document.getElementById("name")?.value || "Anonymous";
+    
+    database.ref('Scores/' + safeUid).set({
+        name: playerName,
+        score: score,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+        console.log("Score saved successfully:", score);
+    }).catch((error) => {
+        console.error("Error saving score:", error);
+    });
+}
 
 function showEndScreen() {
     background(0);
@@ -146,6 +159,8 @@ function showEndScreen() {
     text("Score: " + Score, width / 2, height / 2 + 50);
     textSize(25);
     text("Press 'R' to Restart", width / 2, height / 2 + 100);
+    
+    // Hide game elements
     imgHammer.visible = false;
     bat.visible = false;
     wallLH.visible = false;
@@ -153,10 +168,15 @@ function showEndScreen() {
     wallTop.visible = false;
     wallBot.visible = false;
 
+    // Save score to Firebase
+    saveScoreToFirebase(Score);
+
+    // Remove current ball
     if (currentBall) {
         currentBall.remove();
     }
 
+    // Display score faces
     for (let i = 0; i < Score; i++) {
         image(
             imgFace,
