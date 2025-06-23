@@ -2,10 +2,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase
 import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
+
 const COL_C = 'white';
 const COL_B = '#CD7F32';
 
+
 console.log('%c fb_io.js', 'color: blue; background-color: white;');
+
 
 // Firebase App Initialization
 const FB_GAMECONFIG = {
@@ -19,20 +22,25 @@ const FB_GAMECONFIG = {
     measurementId: "G-860HVWZ49V"
 };
 
+
 const FB_GAMEAPP = initializeApp(FB_GAMECONFIG);
 const fb_gameDB = getDatabase(FB_GAMEAPP);
 
+
 var fb_uid;
 var fb_email;
+
 
 function fb_authenticate() {
     console.log('%c fb_initialise(): ', 'color: ' + COL_C + '; background-color: ' + COL_B + ';');
     const AUTH = getAuth();
     const PROVIDER = new GoogleAuthProvider();
 
+
     PROVIDER.setCustomParameters({
         prompt: 'select_account'
     });
+
 
     signInWithPopup(AUTH, PROVIDER).then((result) => {
         console.log(result);
@@ -45,14 +53,19 @@ function fb_authenticate() {
     });
 }
 
-function fb_write() {
+
+function fb_write(score) {
     if (!fb_uid || !fb_email) {
         console.log("User is not authenticated");
         return;  // Prevent writing if the user is not authenticated
     }
+    if (typeof score === 'undefined') {
+        console.log("Score is undefined, not writing to Firebase.");
+        return;
+    }
 
     const safe_uid = fb_uid.replace(/\./g, '_');
-    const dbReference = ref(fb_gameDB, `Users/${safe_uid}`);
+    const dbReference = ref(fb_gameDB, `Users/${safe_uid}/scores`);
     var _name = document.getElementById("name").value;
 
     if (!_name) {
@@ -60,20 +73,28 @@ function fb_write() {
         return;  // Prevent writing if the name is not provided
     }
 
-    var UserInformation = { name: _name, email: fb_email };
+    var UserInformation = { name: _name, email: fb_email, score: score };
 
-    set(dbReference, UserInformation)
-        .then(() => {
-            console.log("Written the following information to the database:");
-            console.log(UserInformation);
-        })
-        .catch((error) => {
-            console.log("Write error:");
-            console.log(error);
-        });
+    // Use push to allow multiple scores per user
+    import('https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js').then(({ push }) => {
+        push(dbReference, UserInformation)
+            .then(() => {
+                console.log("Written the following information to the database:");
+                console.log(UserInformation);
+            })
+            .catch((error) => {
+                console.log("Write error:");
+                console.log(error);
+            });
+    });
 }
+
 
 export {
     fb_authenticate,
     fb_write
 };
+
+
+
+

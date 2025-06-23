@@ -1,3 +1,13 @@
+// IMPORTANT: Make sure you have initialized Firebase and defined 'database' before this script is loaded.
+// Example (in your HTML before this script):
+// <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+// <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+// <script>
+//   const firebaseConfig = { ... };
+//   firebase.initializeApp(firebaseConfig);
+//   var database = firebase.database();
+// </script>
+
 // Game Project
 // Written by Max Bergman
 
@@ -142,9 +152,11 @@ function showEndScreen() {
     wallRH.visible = false;
     wallTop.visible = false;
     wallBot.visible = false;
+
     if (currentBall) {
         currentBall.remove();
     }
+
     for (let i = 0; i < Score; i++) {
         image(
             imgFace,
@@ -152,12 +164,6 @@ function showEndScreen() {
             height / 2 + 150 + floor(i / 10) * 60,
             50, 50
         );
-    }
-
-
-    if (!showEndScreen.scoreWritten) {
-        writeScoreToFirebase(Score);
-        showEndScreen.scoreWritten = true;
     }
 }
 
@@ -169,30 +175,4 @@ function restartGame() {
     if (currentBall) {
         currentBall.remove();
     }
-    showEndScreen.scoreWritten = false; // Reset flag
-}
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCHDtQ5nuCxgp_XCL_RtR7YVHv8mO1rhmc",
-    authDomain: "comp-2025-max-bergman-4bb13.firebaseapp.com",
-    databaseURL: "https://comp-2025-max-bergman-4bb13-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "comp-2025-max-bergman-4bb13",
-    storageBucket: "comp-2025-max-bergman-4bb13.firebasestorage.app",
-    messagingSenderId: "75891205088",
-    appId: "1:75891205088:web:9ce6dd10fe8f59fb6f8185",
-    measurementId: "G-860HVWZ49V"
-};
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-
-function writeScoreToFirebase(score) {
-  const usersRef = database.ref('Users');
-  usersRef.push({
-    score: score
- });
-}
-
-function endRound() {
-  
-  writeScoreToFirebase(currentScore); 
 }
