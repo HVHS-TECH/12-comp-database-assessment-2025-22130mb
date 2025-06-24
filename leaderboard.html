@@ -11,7 +11,7 @@
       padding: 20px;
     }
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
       background: white;
       padding: 20px;
@@ -19,20 +19,45 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     h1 {
-      color: #CD7F32;
+      color: rgb(88, 197, 233);
       text-align: center;
     }
     #scores-container {
       margin: 20px 0;
       min-height: 300px;
-    }
-    .score-entry {
       display: flex;
-      justify-content: space-between;
-      padding: 10px;
-      margin: 5px 0;
+      gap: 30px;
+      justify-content: center;
+    }
+    .leaderboard-table {
+      flex: 1;
       background: #f9f9f9;
-      border-radius: 4px;
+      border-radius: 8px;
+      padding: 10px 0 20px 0;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .leaderboard-table h2 {
+      text-align: center;
+      color: rgb(88, 197, 233);
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: none;
+    }
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background: rgb(88, 197, 233);
+      color: white;
+      font-weight: bold;
+    }
+    tr:nth-child(even) td {
+      background: #e6f6fb;
     }
     .loading, .error {
       text-align: center;
@@ -44,7 +69,7 @@
       margin-top: 20px;
     }
     button {
-      background-color: #CD7F32;
+      background-color: rgb(88, 197, 233);
       color: white;
       border: none;
       padding: 10px 15px;
@@ -58,7 +83,36 @@
   <div class="container">
     <h1>Top Scores</h1>
     <div id="scores-container">
-      <p class="loading">Loading scores...</p>
+      <div class="leaderboard-table">
+        <h2>Whack a Mole</h2>
+        <table id="wam-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="wam-body">
+            <tr><td colspan="3" class="loading">Loading</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="leaderboard-table">
+        <h2>Coin Collector Gamse</h2>
+        <table id="coin-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="coin-body">
+            <tr><td colspan="3" class="loading">Loading</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     <div class="buttons">
       <button onclick="window.location.href='index.html'">Back to Home</button>
@@ -81,48 +135,45 @@
       messagingSenderId: "75891205088",
       appId: "1:75891205088:web:9ce6dd10fe8f59fb6f8185"
     };
-    
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    function displayScores(scores) {
-      const container = document.getElementById('scores-container');
-      
+    function renderTable(scores, tbodyId) {
+      const tbody = document.getElementById(tbodyId);
       if (!scores || scores.length === 0) {
-        container.innerHTML = '<p class="loading">No scores yet. Be the first to play!</p>';
+        tbody.innerHTML = `<tr><td colspan="3" class="loading">Go Play My Game Loser</td></tr>`;
         return;
       }
-      
-      // Sort scores from highest to lowest
       scores.sort((a, b) => b.score - a.score);
-      
-      container.innerHTML = scores.map((score, index) => `
-        <div class="score-entry">
-          <span>${index + 1}. ${score.name || 'Anonymous'}</span>
-          <span>${score.score} points</span>
-        </div>
+      tbody.innerHTML = scores.map((score, idx) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${score.name || 'Anonymous'}</td>
+          <td>${score.score}</td>
+        </tr>
       `).join('');
     }
 
-    function loadLeaderboard() {
+    
+    function loadLeaderboard(gameType, tbodyId) {
       const scoresRef = database.ref('Scores');
-      
-      scoresRef.orderByChild('score').limitToLast(10).on('value', (snapshot) => {
+      scoresRef.orderByChild('game').equalTo(gameType).limitToLast(10).on('value', (snapshot) => {
         const scores = [];
-        snapshot.forEach((childSnapshot) => {
+        snapshot.forEach(childSnapshot => {
           scores.push(childSnapshot.val());
         });
-        displayScores(scores);
+        renderTable(scores, tbodyId);
       }, (error) => {
-        document.getElementById('scores-container').innerHTML = 
-          '<p class="error">Error loading scores. Please check console.</p>';
+        document.getElementById(tbodyId).innerHTML =
+          `<tr><td colspan="3" class="error">Error loading scores.</td></tr>`;
         console.error("Firebase error:", error);
       });
     }
 
-    // Start loading when page loads
-    window.addEventListener('DOMContentLoaded', loadLeaderboard);
+    window.addEventListener('DOMContentLoaded', () => {
+      loadLeaderboard('wam', 'wam-body');   
+      loadLeaderboard('coin', 'coin-body'); 
+    });
   </script>
 </body>
 </html>

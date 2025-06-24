@@ -33,19 +33,19 @@ const FB_GAMECONFIG = {
   measurementId: "G-860HVWZ49V"
 };
 
-// Initialize Firebase
+
 const FB_GAMEAPP = initializeApp(FB_GAMECONFIG);
 const fb_gameDB = getDatabase(FB_GAMEAPP);
 const auth = getAuth(FB_GAMEAPP);
 
-// Authentication state tracker
+
 let currentUser = null;
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   console.log(user ? "User logged in:" : "User logged out", user?.uid);
 });
 
-// Improved authentication with async/await
+
 async function fb_authenticate() {
   console.log('%c fb_authenticate(): ', `color: ${COL_C}; background-color: ${COL_B};`);
   
@@ -62,16 +62,16 @@ async function fb_authenticate() {
   }
 }
 
-// User profile writer
+
 async function fb_write() {
   if (!currentUser) {
-    console.error("User not authenticated");
+    console.error("User is nt authenticated");
     return false;
   }
 
   const name = document.getElementById("name")?.value?.trim();
   if (!name) {
-    console.error("Name is required");
+    console.error("Name is needed to plau game");
     return false;
   }
 
@@ -84,7 +84,7 @@ async function fb_write() {
       email: currentUser.email,
       lastUpdated: serverTimestamp()
     });
-    console.log("User profile updated");
+    console.log("User profile has been updated");
     return true;
   } catch (error) {
     console.error("Profile update failed:", error);
@@ -92,7 +92,7 @@ async function fb_write() {
   }
 }
 
-// Score writer with validation
+
 async function fb_writeScore(score) {
   if (!currentUser) {
     console.error("Cannot save score: No authenticated user");
@@ -121,7 +121,7 @@ async function fb_writeScore(score) {
   }
 }
 
-// Leaderboard reader with realtime updates
+
 function fb_getLeaderboard(callback) {
   const scoresRef = ref(fb_gameDB, 'Scores');
   const leaderboardQuery = query(
@@ -141,7 +141,6 @@ function fb_getLeaderboard(callback) {
     callback(scores.sort((a, b) => b.score - a.score));
   });
 
-  // Return unsubscribe function for cleanup
   return unsubscribe;
 }
 

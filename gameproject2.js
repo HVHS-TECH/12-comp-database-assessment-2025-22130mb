@@ -16,10 +16,10 @@ var gameState = "start";
 var scoreSaved = false; 
 
 function preload() {
-    imgBG = loadImage('images/pixil-frame-0.png');
-    imgFace = loadImage('images/pixil-frame-0.png');
+    imgBG = loadImage('images/background2.png');
+    imgFace = loadImage('images/coin.png');
     imgHammer = loadImage('images/hammer.png');
-    Background = loadImage('images/background.png');
+    Background = loadImage('images/background2.png');
 }
 
 function setup() {
@@ -129,7 +129,7 @@ function showStartScreen() {
     text("Click or Press Enter To Start", width / 2, height / 2);
 }
 
-// NEW: Firebase Score Saving Function
+
 function saveScoreToFirebase(score) {
     const user = auth.currentUser;
     if (!user) {
@@ -143,7 +143,7 @@ function saveScoreToFirebase(score) {
     database.ref('Scores').push({
         name: playerName,
         score: score,
-        game: "wam", // Add this line!
+        game: "coin", 
         timestamp: firebase.database.ServerValue.TIMESTAMP
     }).then(() => {
         console.log("Score saved successfully:", score);
@@ -181,7 +181,7 @@ function showEndScreen() {
         currentBall.remove();
     }
 
-    // Display score faces
+    // Display score coins
     for (let i = 0; i < Score; i++) {
         image(
             imgFace,
@@ -197,7 +197,7 @@ function restartGame() {
     Score = 0;
     timer = 10;
     frameCount = 0;
-    scoreSaved = false; // Reset flag on restart
+    scoreSaved = false; 
     if (currentBall) {
         currentBall.remove();
     }
@@ -205,5 +205,5 @@ function restartGame() {
 
 function fb_write() {
   const playerName = document.getElementById("name").value || "Anonymous";
-  // ...write playerName to Firebase...
+ 
 }

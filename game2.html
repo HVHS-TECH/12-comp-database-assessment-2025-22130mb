@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Whack-A-Mole Game</title>
+  <title>Coin Collector</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -11,12 +11,12 @@
   <script src="https://p5play.org/v3/planck.min.js"></script>
   <script src="https://p5play.org/v3/p5play.js"></script>
 
-  
+ 
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-  
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCHDtQ5nuCxgp_XCL_RtR7YVHv8mO1rhmc",
@@ -33,16 +33,16 @@
 
 <body>
 
-  <script src="gameproject.js"></script>
+  <script src="gameproject2.js"></script>
 
-    <button onclick="goToCoinCollector()">Play Whack A Mole!</button>
+  <button onclick="goToWhackAMole()">Play Whack A Mole!</button>
   <button onclick="goToHomeScreen()">Go To Home Page!</button>
   <button onclick="goToLeaderboard()">See Your High Scores!</button>
   <script>
     function goToHomeScreen() {
       window.location.href = "index.html";
     }
-    function goToCoinCollector() {
+    function goToWhackAMole() {
       window.location.href = "game.html";
     }
     function goToLeaderboard() {

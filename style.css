@@ -2,8 +2,8 @@
   --main-bg: rgb(96, 196, 230);
   --main-fg: rgb(88, 197, 233);
   --container-bg: white;
-  --button-bg: #CD7F32;
-  --button-hover-bg: #b56c24;
+  --button-bg: rgb(88, 197, 233);
+  --button-hover-bg: #1565c0;   /* Darker blue for hover */
   --leaderboard-row-alt: #e6f6fb;
   --rank-color: #CD7F32;
   --timestamp-color: #999;
@@ -46,7 +46,7 @@ button {
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  margin: 0 10px;
+  margin: 0 16px;
   transition: background-color 0.3s;
 }
 
