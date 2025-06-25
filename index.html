@@ -16,10 +16,16 @@
       <button onclick="fb_authenticate()">Login with Google</button>
     </div>
     
-    <form id="fruitForm" style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
+    <form id="Name" style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
       <label for="name">Your Name (Does Not Need To Be Real Name):</label>
       <input type="text" id="name" name="name" required />
       <button type="button" onclick="localStorage.setItem('name', document.getElementById('name').value); fb_write()">Submit</button>
+    </form>
+
+     <form id="Age" style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
+      <label for="Age">Your Age:</label>
+      <input type="text" id="Age" name="Age" required />
+      <button type="button" onclick="localStorage.setItem('Age', document.getElementById('Age').value); fb_write()">Submit</button>
     </form>
 
     

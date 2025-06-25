@@ -81,6 +81,7 @@ async function fb_write() {
   try {
     await set(userRef, {
       name: name,
+      Age: Age,
       email: currentUser.email,
       lastUpdated: serverTimestamp()
     });
