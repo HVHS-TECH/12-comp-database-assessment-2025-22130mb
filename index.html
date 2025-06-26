@@ -24,7 +24,7 @@
     <!-- Name Submission Form -->
     <form id="Name" style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
       <label for="name">Your Name:</label>
-      <input type="text" id="name" name="name" placeholder="Enter your name" required />
+      <input type="text" id="name" name="name" placeholder="Enter your name" required maxlength="20" />
       <button type="button" onclick="localStorage.setItem('name', document.getElementById('name').value); fb_write()">Submit</button>
     </form>
     <p id="nameStatus" class="status-message" aria-live="polite"></p>
@@ -48,6 +48,13 @@
     function goToCoinCollector() {
       window.location.href = "game2.html";
     }
+
+    // Prevent numbers in the name input
+    const nameInput = document.getElementById('name');
+    nameInput.addEventListener('input', () => {
+      // Remove any digits entered
+      nameInput.value = nameInput.value.replace(/[0-9]/g, '');
+    });
   </script>
 </body>
 </html>
