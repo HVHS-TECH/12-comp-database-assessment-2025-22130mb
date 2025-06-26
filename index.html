@@ -11,34 +11,37 @@
 </head>
 <body>
   <div class="container">
+    <!-- Header Section -->
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
       <h1 style="margin: 0;">Max's Marvelous Games</h1>
-      <button onclick="fb_authenticate()">Login with Google</button>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img id="profilePicture" src="" alt="Profile Picture" 
+          style="display: none; width: 50px; height: 50px; border-radius: 50%; border: 2px solid #00A8E8;" />
+        <button onclick="fb_authenticate()">Login with Google</button>
+      </div>
     </div>
     
+    <!-- Name Submission Form -->
     <form id="Name" style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-      <label for="name">Your Name (Does Not Need To Be Real Name):</label>
-      <input type="text" id="name" name="name" required />
+      <label for="name">Your Name:</label>
+      <input type="text" id="name" name="name" placeholder="Enter your name" required />
       <button type="button" onclick="localStorage.setItem('name', document.getElementById('name').value); fb_write()">Submit</button>
     </form>
-
-     <form id="Age" style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-      <label for="Age">Your Age:</label>
-      <input type="text" id="Age" name="Age" required />
-      <button type="button" onclick="localStorage.setItem('Age', document.getElementById('Age').value); fb_write()">Submit</button>
-    </form>
-
+    <p id="nameStatus" class="status-message" aria-live="polite"></p>
     
+    <!-- Navigation Buttons -->
     <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 24px;">
       <button onclick="goToWhackAMole()">Play Whack A Mole!</button>
       <button onclick="goToCoinCollector()">Play Coin Collector</button>
       <button onclick="window.location.href='leaderboard.html'">View Leaderboard</button>
     </div>
 
-    <p id="statusMessage"></p>
+    <!-- Status Message -->
+    <p id="statusMessage" class="status-message" aria-live="polite">Please log in to start playing!</p>
   </div>
 
   <script>
+    // Navigation Functions
     function goToWhackAMole() {
       window.location.href = "game.html";
     }

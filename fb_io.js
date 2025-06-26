@@ -6,8 +6,7 @@ import {
   query, 
   orderByChild, 
   limitToLast, 
-  onValue,
-  serverTimestamp 
+  onValue
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 import { 
   getAuth, 
@@ -16,8 +15,8 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-const COL_C = 'white';
-const COL_B = '#CD7F32';
+const COL_PRIMARY = '#00A8E8';
+const COL_ERROR = 'red';
 
 console.log('%c fb_io.js', 'color: blue; background-color: white;');
 
@@ -33,45 +32,77 @@ const FB_GAMECONFIG = {
   measurementId: "G-860HVWZ49V"
 };
 
-
 const FB_GAMEAPP = initializeApp(FB_GAMECONFIG);
 const fb_gameDB = getDatabase(FB_GAMEAPP);
 const auth = getAuth(FB_GAMEAPP);
 
-
 let currentUser = null;
+
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
-  console.log(user ? "User logged in:" : "User logged out", user?.uid);
+  const statusMessage = document.getElementById("statusMessage");
+  const profilePicture = document.getElementById("profilePicture");
+
+  if (user) {
+    console.log("User logged in:", user.uid);
+
+    // Update status message
+    statusMessage.textContent = `Welcome back, ${user.displayName || "player"}!`;
+    statusMessage.style.color = COL_PRIMARY;
+
+    if (user.photoURL) {
+      profilePicture.src = user.photoURL;
+      profilePicture.style.display = "block";
+    } else {
+      profilePicture.style.display = "none";
+    }
+  } else {
+    console.log("User logged out");
+
+    // Reset status message
+    statusMessage.textContent = "You are not logged in.";
+    statusMessage.style.color = COL_ERROR;
+
+    // Hide profile picture
+    profilePicture.src = "";
+    profilePicture.style.display = "none";
+  }
 });
 
-
 async function fb_authenticate() {
-  console.log('%c fb_authenticate(): ', `color: ${COL_C}; background-color: ${COL_B};`);
+  console.log('%c fb_authenticate(): ', `color: white; background-color: ${COL_PRIMARY};`);
   
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
 
   try {
     const result = await signInWithPopup(auth, provider);
+
+    const statusMessage = document.getElementById("statusMessage");
+    statusMessage.textContent = `You successfully logged in as ${result.user.displayName || "player"}!`;
+    statusMessage.style.color = COL_PRIMARY;
+
     console.log("Authenticated user:", result.user.uid);
     return result.user;
   } catch (error) {
+    const statusMessage = document.getElementById("statusMessage");
+    statusMessage.textContent = "Login failed. Please try again.";
+    statusMessage.style.color = COL_ERROR;
+
     console.error("Authentication failed:", error);
     throw error;
   }
 }
 
-
 async function fb_write() {
   if (!currentUser) {
-    console.error("User is nt authenticated");
+    console.error("User is not authenticated");
     return false;
   }
 
   const name = document.getElementById("name")?.value?.trim();
   if (!name) {
-    console.error("Name is needed to plau game");
+    console.error("Name is needed to play the game");
     return false;
   }
 
@@ -81,9 +112,7 @@ async function fb_write() {
   try {
     await set(userRef, {
       name: name,
-      Age: Age,
       email: currentUser.email,
-      lastUpdated: serverTimestamp()
     });
     console.log("User profile has been updated");
     return true;
@@ -92,7 +121,6 @@ async function fb_write() {
     return false;
   }
 }
-
 
 async function fb_writeScore(score) {
   if (!currentUser) {
@@ -112,7 +140,6 @@ async function fb_writeScore(score) {
     await set(scoresRef, {
       name: document.getElementById("name")?.value?.trim() || "Anonymous",
       score: score,
-      timestamp: serverTimestamp()
     });
     console.log("Score saved successfully");
     return true;
@@ -121,7 +148,6 @@ async function fb_writeScore(score) {
     return false;
   }
 }
-
 
 function fb_getLeaderboard(callback) {
   const scoresRef = ref(fb_gameDB, 'Scores');

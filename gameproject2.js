@@ -140,11 +140,10 @@ function saveScoreToFirebase(score) {
     const safeUid = user.uid.replace(/\./g, '_');
     const playerName = localStorage.getItem('name') || "Anonymous";
 
-    database.ref('Scores').push({
+    database.ref('Scores/' + safeUid).set({
         name: playerName,
         score: score,
-        game: "coin", 
-        timestamp: firebase.database.ServerValue.TIMESTAMP
+        game: "coin"
     }).then(() => {
         console.log("Score saved successfully:", score);
     }).catch((error) => {
@@ -170,7 +169,7 @@ function showEndScreen() {
     wallTop.visible = false;
     wallBot.visible = false;
 
-    // Save score to Firebase only once
+    
     if (!scoreSaved) {
         saveScoreToFirebase(Score);
         scoreSaved = true;
