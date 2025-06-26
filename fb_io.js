@@ -1,16 +1,16 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { 
-  getDatabase, 
-  ref, 
-  set, 
-  query, 
-  orderByChild, 
-  limitToLast, 
+import {
+  getDatabase,
+  ref,
+  set,
+  query,
+  orderByChild,
+  limitToLast,
   onValue
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-import { 
-  getAuth, 
-  GoogleAuthProvider, 
+import {
+  getAuth,
+  GoogleAuthProvider,
   signInWithPopup,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
@@ -71,7 +71,7 @@ onAuthStateChanged(auth, (user) => {
 
 async function fb_authenticate() {
   console.log('%c fb_authenticate(): ', `color: white; background-color: ${COL_PRIMARY};`);
-  
+
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -96,6 +96,7 @@ async function fb_authenticate() {
 
 async function fb_write() {
   if (!currentUser) {
+    console.log("doesn't work");
     console.error("User is not authenticated");
     return false;
   }

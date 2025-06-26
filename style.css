@@ -3,7 +3,8 @@
   --main-fg: rgb(88, 197, 233);
   --container-bg: white;
   --button-bg: rgb(88, 197, 233);
-  --button-hover-bg: #1565c0;   /* Darker blue for hover */
+  --button-hover-bg: #1565c0;
+  /* Darker blue for hover */
   --leaderboard-row-alt: #e6f6fb;
   --rank-color: #CD7F32;
   --timestamp-color: #999;
@@ -63,9 +64,11 @@ button:hover {
 .score-entry .rank {
   color: var(--rank-color);
 }
+
 .score-entry:nth-child(odd) {
   background-color: var(--leaderboard-row-alt);
 }
+
 .timestamp {
   color: var(--timestamp-color);
 }

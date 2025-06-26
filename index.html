@@ -1,6 +1,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,27 +10,29 @@
   <script type="module" src="./main.mjs"></script>
   <script type="module" src="./fb_io.js"></script>
 </head>
+
 <body>
   <div class="container">
-    
+
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
       <h1 style="margin: 0;">Max's Marvelous Games</h1>
       <div style="display: flex; align-items: center; gap: 10px;">
-        <img id="profilePicture" src="" alt="Profile Picture" 
+        <img id="profilePicture" src="" alt="Profile Picture"
           style="display: none; width: 50px; height: 50px; border-radius: 50%; border: 2px solid #00A8E8;" />
         <button onclick="fb_authenticate()">Login with Google</button>
       </div>
     </div>
-    
-    
+
+
     <form id="Name" style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
       <label for="name">Your Name:</label>
       <input type="text" id="name" name="name" placeholder="Enter your name" required maxlength="20" />
-      <button type="button" onclick="localStorage.setItem('name', document.getElementById('name').value); fb_write()">Submit</button>
+      <button type="button"
+        onclick="localStorage.setItem('name', document.getElementById('name').value); fb_write()">Submit</button>
     </form>
     <p id="nameStatus" class="status-message" aria-live="polite"></p>
-    
-   
+
+
     <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 24px;">
       <button onclick="goToWhackAMole()">Play Whack A Mole!</button>
       <button onclick="goToCoinCollector()">Play Coin Collector</button>
@@ -57,4 +60,5 @@
     });
   </script>
 </body>
+
 </html>

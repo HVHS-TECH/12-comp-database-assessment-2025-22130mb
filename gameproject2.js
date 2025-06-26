@@ -13,7 +13,7 @@ var currentBall;
 var imgFace, imgHammer;
 var Background;
 var gameState = "start";
-var scoreSaved = false; 
+var scoreSaved = false;
 
 function preload() {
     imgBG = loadImage('images/background2.png');
@@ -169,7 +169,7 @@ function showEndScreen() {
     wallTop.visible = false;
     wallBot.visible = false;
 
-    
+
     if (!scoreSaved) {
         saveScoreToFirebase(Score);
         scoreSaved = true;
@@ -196,13 +196,13 @@ function restartGame() {
     Score = 0;
     timer = 10;
     frameCount = 0;
-    scoreSaved = false; 
+    scoreSaved = false;
     if (currentBall) {
         currentBall.remove();
     }
 }
 
 function fb_write() {
-  const playerName = document.getElementById("name").value || "Anonymous";
- 
+    const playerName = document.getElementById("name").value || "Anonymous";
+
 }

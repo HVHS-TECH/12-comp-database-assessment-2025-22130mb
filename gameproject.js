@@ -13,7 +13,7 @@ var currentBall;
 var imgFace, imgHammer;
 var Background;
 var gameState = "start";
-var scoreSaved = false; 
+var scoreSaved = false;
 
 function preload() {
     imgBG = loadImage('images/pixil-frame-0.png');
@@ -203,6 +203,6 @@ function restartGame() {
 }
 
 function fb_write() {
-  const playerName = document.getElementById("name").value || "Anonymous";
-  // ...write playerName to Firebase...
+    const playerName = document.getElementById("name").value || "Anonymous";
+    // ...write playerName to Firebase...
 }
