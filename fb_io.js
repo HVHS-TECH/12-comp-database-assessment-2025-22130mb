@@ -109,7 +109,7 @@ async function fb_write() {
 
   const safeUid = currentUser.uid.replace(/\./g, '_');
   const userRef = ref(fb_gameDB, `Users/${safeUid}`);
-
+//hi
   try {
     await set(userRef, {
       name: name,
