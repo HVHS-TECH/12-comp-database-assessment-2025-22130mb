@@ -130,17 +130,17 @@ function showStartScreen() {
 }
 
 
-function saveScoreToFirebase(score) {
+function saveScoreToFirebase(score) { // saves score to firebase under the current user that is logged in through fb authenticate
     const user = auth.currentUser;
     if (!user) {
         console.log("User not authenticated - score not saved");
         return;
     }
 
-    const safeUid = user.uid.replace(/\./g, '_');
+    const safeUid = user.uid.replace(/\./g, '_'); // firebase doesn't like these characters, i had a error due to them so i had to fix it by doing this.
     const playerName = localStorage.getItem('name') || "Anonymous";
 
-    database.ref('Scores/' + safeUid).set({
+    database.ref('Scores/' + safeUid).set({ //saves scores ,name and correct gae under the google user id 
         name: playerName,
         score: score,
         game: "wam"
@@ -202,7 +202,7 @@ function restartGame() {
     }
 }
 
-function fb_write() {
+function fb_write() { // writes player name to fb 
     const playerName = document.getElementById("name").value || "Anonymous";
-    // ...write playerName to Firebase...
+    
 }

@@ -1,26 +1,20 @@
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import {
-  getDatabase,
-  ref,
-  set,
-  query,
-  orderByChild,
-  limitToLast,
-  onValue
+import { 
+  getDatabase, ref, set, query, orderByChild, limitToLast, onValue 
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  onAuthStateChanged
+import { 
+  getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut 
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
+//colours for messages
 const COL_PRIMARY = '#00A8E8';
 const COL_ERROR = 'red';
 
+// log to see if file loaded right
 console.log('%c fb_io.js', 'color: blue; background-color: white;');
 
-// Firebase Configuration
+// My Firebase project setup/config
 const FB_GAMECONFIG = {
   apiKey: "AIzaSyCHDtQ5nuCxgp_XCL_RtR7YVHv8mO1rhmc",
   authDomain: "comp-2025-max-bergman-4bb13.firebaseapp.com",
@@ -32,48 +26,67 @@ const FB_GAMECONFIG = {
   measurementId: "G-860HVWZ49V"
 };
 
+// Initialize Firebase App
 const FB_GAMEAPP = initializeApp(FB_GAMECONFIG);
+// Get access to Realtime Database and Auth
 const fb_gameDB = getDatabase(FB_GAMEAPP);
 const auth = getAuth(FB_GAMEAPP);
 
+// holds signed in user 
 let currentUser = null;
 
+// looks for changed on auth state 
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
+  window.currentUser = user; 
+
+  // Grab elements from the page to update UI
   const statusMessage = document.getElementById("statusMessage");
   const profilePicture = document.getElementById("profilePicture");
+  const whackBtn = document.getElementById("whackBtn");
+  const coinBtn = document.getElementById("coinBtn");
 
   if (user) {
+    // someone just logged in
     console.log("User logged in:", user.uid);
 
-    // Update status message
     statusMessage.textContent = `Welcome back, ${user.displayName || "player"}!`;
     statusMessage.style.color = COL_PRIMARY;
 
-    if (user.photoURL) {
-      profilePicture.src = user.photoURL;
-      profilePicture.style.display = "block";
-    } else {
-      profilePicture.style.display = "none";
+    // show profile pic if they have one
+    if (profilePicture) {
+      profilePicture.src = user.photoURL || "";
+      profilePicture.style.display = user.photoURL ? "block" : "none";
     }
+
+    // enable game buttons once logged i
+    if (whackBtn) whackBtn.disabled = false;
+    if (coinBtn) coinBtn.disabled = false;
+
   } else {
+    // no one has logged in
     console.log("User logged out");
 
-    // Reset status message
     statusMessage.textContent = "You are not logged in.";
     statusMessage.style.color = COL_ERROR;
 
-    // Hide profile picture
-    profilePicture.src = "";
-    profilePicture.style.display = "none";
+    if (profilePicture) {
+      profilePicture.src = "";
+      profilePicture.style.display = "none";
+    }
+
+    // disable game buttons until login
+    if (whackBtn) whackBtn.disabled = true;
+    if (coinBtn) coinBtn.disabled = true;
   }
 });
 
+// google authentication
 async function fb_authenticate() {
   console.log('%c fb_authenticate(): ', `color: white; background-color: ${COL_PRIMARY};`);
 
   const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
+  provider.setCustomParameters({ prompt: 'select_account' }); // always ask to choose account
 
   try {
     const result = await signInWithPopup(auth, provider);
@@ -94,25 +107,47 @@ async function fb_authenticate() {
   }
 }
 
+// Logs the user out
+async function fb_signout() {
+  const AUTH = getAuth();
+
+  try {
+    await signOut(AUTH); 
+    console.log("Logout success");
+  } catch (error) {
+    console.log("Logout error");
+    console.error(error);
+  }
+}
+
+// Saves the user’s name and age to fb
 async function fb_write() {
   if (!currentUser) {
-    console.log("doesn't work");
     console.error("User is not authenticated");
     return false;
   }
 
-  const name = document.getElementById("name")?.value?.trim();
+  const name = document.getElementById("name")?.value?.trim();    
+  const age = parseInt(document.getElementById("age")?.value?.trim(), 10);
+
   if (!name) {
     console.error("Name is needed to play the game");
     return false;
   }
 
+  if (isNaN(age) || age < 0 || age > 100) { //age cant be less than 0 or more than 100
+    console.error("Invalid age value");
+    return false;
+  }
+
+  // Replaces . with _ because fb doesn't like .
   const safeUid = currentUser.uid.replace(/\./g, '_');
   const userRef = ref(fb_gameDB, `Users/${safeUid}`);
-//hi
+
   try {
     await set(userRef, {
       name: name,
+      age: age,
       email: currentUser.email,
     });
     console.log("User profile has been updated");
@@ -123,58 +158,65 @@ async function fb_write() {
   }
 }
 
+//write just the score, after game ends
 async function fb_writeScore(score) {
   if (!currentUser) {
     console.error("Cannot save score: No authenticated user");
     return false;
   }
 
-  if (typeof score !== 'number' || score < 0) {
-    console.error("Invalid score value:", score);
-    return false;
+  if (typeof score !== 'number' || score < 0) { //means score has to be 0 or more
+    console.error("Invalid score value:", score); //error for negative score
+    return false; 
   }
 
-  const safeUid = currentUser.uid.replace(/\./g, '_');
-  const scoresRef = ref(fb_gameDB, `Scores/${safeUid}`);
+  const safeUid = currentUser.uid.replace(/\./g, '_'); // referenced in game projects already, prevents names with those charachters that in it
+  const scoresRef = ref(fb_gameDB, `Scores/${safeUid}`); //saves scores in db under user id
 
   try {
-    await set(scoresRef, {
+    await set(scoresRef, { //write score and data to user score path
       name: document.getElementById("name")?.value?.trim() || "Anonymous",
-      score: score,
+      score: score, //score saving
     });
     console.log("Score saved successfully");
     return true;
   } catch (error) {
-    console.error("Score save failed:", error);
+    console.error("Score save failed:", error);//returns the error if score can be found
     return false;
   }
 }
 
+// get top 10 scores from firebase
 function fb_getLeaderboard(callback) {
   const scoresRef = ref(fb_gameDB, 'Scores');
   const leaderboardQuery = query(
     scoresRef,
-    orderByChild('score'),
-    limitToLast(10)
+    orderByChild('score'),  // sort by score
+    limitToLast(10)         //limits only op 10
   );
 
+  // Listen for updates in real time
   const unsubscribe = onValue(leaderboardQuery, (snapshot) => {
     const scores = [];
     snapshot.forEach((child) => {
-      scores.push({
-        id: child.key,
+      scores.push({ //pushes scores through to fb
+        id: child.key, 
         ...child.val()
       });
     });
+
+    // sorts all scores from low to high, 1-10
     callback(scores.sort((a, b) => b.score - a.score));
   });
 
-  return unsubscribe;
+  return unsubscribe; // used later to stop looking for updates
 }
+
 
 export {
   fb_authenticate,
   fb_write,
   fb_writeScore,
-  fb_getLeaderboard
+  fb_getLeaderboard,
+  fb_signout
 };

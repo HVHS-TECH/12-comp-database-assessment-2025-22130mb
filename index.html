@@ -1,62 +1,108 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Max's Marvelous Games</title>
-  <link rel="stylesheet" href="style.css" />
-  <script type="module" src="./main.mjs"></script>
-  <script type="module" src="./fb_io.js"></script>
+  <meta charset="UTF-8" /> <!-- tells the browser to use UTF-8 character encoding -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <!-- makes the page responsive on phones -->
+  <title>Max's Marvelous Games</title> <!-- tab title -->
+  <link rel="stylesheet" href="style.css" /> <!-- link to external CSS file -->
+  <script type="module" src="./main.mjs"></script> <!-- main logic for the games -->
+  <script type="module" src="./fb_io.js"></script> <!-- handles all firebase stuff -->
 </head>
 
 <body>
-  <div class="container">
+  <div class="container"> <!-- main wrapper for everything -->
 
+    <!-- Header section with title + login/logout/profile -->
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
       <h1 style="margin: 0;">Max's Marvelous Games</h1>
       <div style="display: flex; align-items: center; gap: 10px;">
+        <!-- profile pic only shows when you're logged in -->
         <img id="profilePicture" src="" alt="Profile Picture"
           style="display: none; width: 50px; height: 50px; border-radius: 50%; border: 2px solid #00A8E8;" />
-        <button onclick="fb_authenticate()">Login with Google</button>
+        <button onclick="fb_authenticate()">Login with Google</button> <!-- login button -->
+        <button onclick="fb_signout()">Logout</button> <!-- logout button -->
       </div>
     </div>
 
-
+    <!-- form for collecting name and age -->
     <form id="Name" style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
       <label for="name">Your Name:</label>
+      <!-- user types their name here, required + max 20 chars -->
       <input type="text" id="name" name="name" placeholder="Enter your name" required maxlength="20" />
-      <button type="button"
-        onclick="localStorage.setItem('name', document.getElementById('name').value); fb_write()">Submit</button>
+
+      <label for="age">Your Age:</label>
+      <!-- age input, has to be between 0 and 100 -->
+      <input type="number" id="age" name="age" placeholder="Enter your age" required min="0" max="100" />
+
+      <button type="button" onclick="submitUserData()">Submit</button> <!-- submit name and age -->
     </form>
+
+    <!-- message shows if name/age is invalid or after submitting -->
     <p id="nameStatus" class="status-message" aria-live="polite"></p>
 
-
+    <!-- game buttons that only work if logged in -->
     <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 24px;">
-      <button onclick="goToWhackAMole()">Play Whack A Mole!</button>
-      <button onclick="goToCoinCollector()">Play Coin Collector</button>
+      <button id="whackBtn" onclick="goToWhackAMole()" disabled>Play Whack A Mole!</button>
+      <button id="coinBtn" onclick="goToCoinCollector()" disabled>Play Coin Collector</button>
       <button onclick="window.location.href='leaderboard.html'">View Leaderboard</button>
     </div>
 
-    <!-- Status Message -->
+    <!-- default message before login -->
     <p id="statusMessage" class="status-message" aria-live="polite">Please log in to start playing!</p>
   </div>
 
   <script>
-    // Navigation Functions
+    // sends you to whack-a-mole game page
     function goToWhackAMole() {
       window.location.href = "game.html";
     }
+
+    // sends you to coin collector game page
     function goToCoinCollector() {
       window.location.href = "game2.html";
     }
 
-    // Prevent numbers in the name input
+    // stops people from putting numbers in the name field
     const nameInput = document.getElementById('name');
     nameInput.addEventListener('input', () => {
-      // Remove any digits entered
       nameInput.value = nameInput.value.replace(/[0-9]/g, '');
+    });
+
+    // takes name and age from the form, checks if valid, saves them, and writes to firebase
+    function submitUserData() {
+      const name = document.getElementById('name').value.trim();
+      const age = parseInt(document.getElementById('age').value.trim(), 10);
+
+      if (name === "") {
+        document.getElementById('nameStatus').textContent = "Name cannot be empty.";
+        return;
+      }
+
+      if (isNaN(age) || age < 0 || age > 100) {
+        document.getElementById('nameStatus').textContent = "Please enter a valid age between 0 and 100.";
+        return;
+      }
+
+      // save data to local storage so I can use it in other places
+      localStorage.setItem('name', name);
+      localStorage.setItem('age', age);
+
+      fb_write(); // custom function that writes the data to firebase
+      document.getElementById('nameStatus').textContent = "Submitted!";
+    }
+
+    // once the page loads, check if user is logged in and enable the game buttons
+    window.addEventListener("DOMContentLoaded", () => {
+      const enableGameButtonsIfLoggedIn = () => {
+        if (window.currentUser) {
+          document.getElementById("whackBtn").disabled = false;
+          document.getElementById("coinBtn").disabled = false;
+        }
+      };
+
+      // slight delay to wait for firebase to figure out if user is logged in
+      setTimeout(enableGameButtonsIfLoggedIn, 1000);
     });
   </script>
 </body>

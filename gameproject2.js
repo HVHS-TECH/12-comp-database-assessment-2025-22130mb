@@ -130,17 +130,17 @@ function showStartScreen() {
 }
 
 
-function saveScoreToFirebase(score) {
-    const user = auth.currentUser;
+function saveScoreToFirebase(score) { //function to send score to firebase
+    const user = auth.currentUser; //links back to auth function where name is saved
     if (!user) {
         console.log("User not authenticated - score not saved");
         return;
     }
 
-    const safeUid = user.uid.replace(/\./g, '_');
+    const safeUid = user.uid.replace(/\./g, '_'); // i was getting a lot of errors in my fb due to these specific characters, so this makes it so they cant be put in it
     const playerName = localStorage.getItem('name') || "Anonymous";
 
-    database.ref('Scores/' + safeUid).set({
+    database.ref('Scores/' + safeUid).set({ //writes name, score, and correct game to fb
         name: playerName,
         score: score,
         game: "coin"
@@ -170,8 +170,8 @@ function showEndScreen() {
     wallBot.visible = false;
 
 
-    if (!scoreSaved) {
-        saveScoreToFirebase(Score);
+    if (!scoreSaved) { //makes sure score is saved only once
+        saveScoreToFirebase(Score); //writes the final score to fb 
         scoreSaved = true;
     }
 
@@ -202,7 +202,7 @@ function restartGame() {
     }
 }
 
-function fb_write() {
+function fb_write() { 
     const playerName = document.getElementById("name").value || "Anonymous";
 
 }
